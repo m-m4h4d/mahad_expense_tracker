@@ -42,7 +42,9 @@ class _MainDashboardState extends State<MainDashboard> {
             IconButton(
               icon: Icon(
                 _currentIndex == 0 ? Icons.home : Icons.home_outlined,
-                color: _currentIndex == 0 ? Theme.of(context).colorScheme.primary : null,
+                color: _currentIndex == 0
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               onPressed: () {
                 setState(() => _currentIndex = 0);
@@ -50,8 +52,12 @@ class _MainDashboardState extends State<MainDashboard> {
             ),
             IconButton(
               icon: Icon(
-                _currentIndex == 1 ? Icons.currency_exchange : Icons.currency_exchange,
-                color: _currentIndex == 1 ? Theme.of(context).colorScheme.primary : null,
+                _currentIndex == 1
+                    ? Icons.currency_exchange
+                    : Icons.currency_exchange,
+                color: _currentIndex == 1
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               onPressed: () {
                 setState(() => _currentIndex = 1);
@@ -60,7 +66,9 @@ class _MainDashboardState extends State<MainDashboard> {
             IconButton(
               icon: Icon(
                 _currentIndex == 2 ? Icons.settings : Icons.settings_outlined,
-                color: _currentIndex == 2 ? Theme.of(context).colorScheme.primary : null,
+                color: _currentIndex == 2
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               onPressed: () {
                 setState(() => _currentIndex = 2);
@@ -73,10 +81,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 transitionBuilder: (Widget child, Animation<double> animation) {
                   return RotationTransition(
                     turns: animation,
-                    child: ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    ),
+                    child: ScaleTransition(scale: animation, child: child),
                   );
                 },
                 child: Icon(
@@ -100,18 +105,23 @@ class _MainDashboardState extends State<MainDashboard> {
                 Navigator.push(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => const AddExpenseScreen(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(0.0, 1.0);
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOut;
-                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const AddExpenseScreen(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(0.0, 1.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOut;
+                          var tween = Tween(
+                            begin: begin,
+                            end: end,
+                          ).chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
                   ),
                 );
               },

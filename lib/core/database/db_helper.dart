@@ -41,7 +41,7 @@ class DatabaseHelper {
         date $textType
       )
     ''');
-    
+
     await db.execute('''
       CREATE TABLE users (
         id $idType,
@@ -57,7 +57,7 @@ class DatabaseHelper {
     if (oldVersion < 2) {
       const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
       const textType = 'TEXT NOT NULL';
-      
+
       await db.execute('''
         CREATE TABLE IF NOT EXISTS users (
           id $idType,
@@ -96,11 +96,7 @@ class DatabaseHelper {
 
   Future<int> deleteExpense(int id) async {
     final db = await instance.database;
-    return await db.delete(
-      'expenses',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
 
   // --- Users CRUD ---
@@ -134,7 +130,11 @@ class DatabaseHelper {
 
   Future<User?> getUserByUsername(String username) async {
     final db = await instance.database;
-    final maps = await db.query('users', where: 'username = ?', whereArgs: [username]);
+    final maps = await db.query(
+      'users',
+      where: 'username = ?',
+      whereArgs: [username],
+    );
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
     }

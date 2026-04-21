@@ -17,10 +17,7 @@ class SettingsScreen extends StatelessWidget {
     final supportedCurrencies = ['PKR', 'INR', 'GBP', 'USD', 'EUR'];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Settings'), elevation: 0),
       body: ListView(
         children: [
           const SizedBox(height: 16),
@@ -32,10 +29,7 @@ class SettingsScreen extends StatelessWidget {
             trailing: DropdownButton<String>(
               value: expenseProvider.baseCurrency,
               items: supportedCurrencies.map((String currency) {
-                return DropdownMenuItem(
-                  value: currency,
-                  child: Text(currency),
-                );
+                return DropdownMenuItem(value: currency, child: Text(currency));
               }).toList(),
               onChanged: (String? newValue) {
                 if (newValue != null) {
@@ -76,7 +70,10 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pop(context);
                         authProvider.logout();
                       },
-                      child: const Text('Logout', style: TextStyle(color: Colors.red)),
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(color: Colors.red),
+                      ),
                     ),
                   ],
                 ),
@@ -101,9 +98,9 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

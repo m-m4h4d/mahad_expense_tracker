@@ -29,10 +29,7 @@ class ThemeProvider extends ChangeNotifier {
     useMaterial3: true,
     colorSchemeSeed: Colors.green,
     brightness: Brightness.light,
-    appBarTheme: const AppBarTheme(
-      centerTitle: true,
-      elevation: 0,
-    ),
+    appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       elevation: 2,
     ),
@@ -46,10 +43,7 @@ class ThemeProvider extends ChangeNotifier {
     useMaterial3: true,
     colorSchemeSeed: Colors.green,
     brightness: Brightness.dark,
-    appBarTheme: const AppBarTheme(
-      centerTitle: true,
-      elevation: 0,
-    ),
+    appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       elevation: 2,
     ),

@@ -33,13 +33,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-             padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             child: Form(
               key: _formKey,
               child: Column(
@@ -51,8 +49,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -104,7 +102,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty || !value.contains('@')) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !value.contains('@')) {
                         return 'Please enter a valid email';
                       }
                       return null;
@@ -160,7 +160,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 // Since we pushed this on top of LoginScreen, we can just pop back to login
                                 // or pushReplacement to Dashboard. Since AuthChecker dynamically builds,
                                 // popping might land on login briefly before jumping. popping all works.
-                                Navigator.of(context).popUntil((route) => route.isFirst);
+                                Navigator.of(
+                                  context,
+                                ).popUntil((route) => route.isFirst);
                               }
                             }
                           },

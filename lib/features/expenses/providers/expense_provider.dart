@@ -23,18 +23,23 @@ class ExpenseProvider extends ChangeNotifier {
   // Currency Exchange state
   String _baseCurrency = 'PKR';
   String get baseCurrency => _baseCurrency;
-  
+
   String get currencySymbol {
     switch (_baseCurrency) {
-      case 'PKR': return 'Rs ';
-      case 'INR': return '₹';
-      case 'GBP': return '£';
-      case 'EUR': return '€';
+      case 'PKR':
+        return 'Rs ';
+      case 'INR':
+        return '₹';
+      case 'GBP':
+        return '£';
+      case 'EUR':
+        return '€';
       case 'USD':
-      default: return '\$';
+      default:
+        return '\$';
     }
   }
-  
+
   double _exchangeRate = 1.0;
   String _targetCurrency = 'PKR';
   String get targetCurrency => _targetCurrency;
@@ -63,7 +68,7 @@ class ExpenseProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('baseCurrency', currency);
     // Reset target currency to base to avoid immediate wrong conversions
-    _targetCurrency = currency; 
+    _targetCurrency = currency;
     _exchangeRate = 1.0;
     notifyListeners();
   }
@@ -108,8 +113,11 @@ class ExpenseProvider extends ChangeNotifier {
 
   void _applyFiltersAndSearch() {
     _filteredExpenses = _expenses.where((expense) {
-      final matchesCategory = _selectedCategory == 'All' || expense.category == _selectedCategory;
-      final matchesSearch = expense.title.toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchesCategory =
+          _selectedCategory == 'All' || expense.category == _selectedCategory;
+      final matchesSearch = expense.title.toLowerCase().contains(
+        _searchQuery.toLowerCase(),
+      );
       return matchesCategory && matchesSearch;
     }).toList();
   }
@@ -120,9 +128,11 @@ class ExpenseProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse('https://api.exchangerate-api.com/v4/latest/$_baseCurrency');
+      final url = Uri.parse(
+        'https://api.exchangerate-api.com/v4/latest/$_baseCurrency',
+      );
       final response = await http.get(url);
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         _exchangeRate = (data['rates'][target] ?? 1.0).toDouble();

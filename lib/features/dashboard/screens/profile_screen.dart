@@ -69,10 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile Details'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Profile Details'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -84,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
             const SizedBox(height: 24),
-            
+
             // Read-only Details
             Card(
               child: Padding(
@@ -92,13 +89,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Full Name', style: Theme.of(context).textTheme.labelSmall),
+                    Text(
+                      'Full Name',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
                     const SizedBox(height: 4),
-                    Text(user.fullName, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      user.fullName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const Divider(height: 24),
-                    Text('Email', style: Theme.of(context).textTheme.labelSmall),
+                    Text(
+                      'Email',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
                     const SizedBox(height: 4),
-                    Text(user.email, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      user.email,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ],
                 ),
               ),
@@ -106,7 +115,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 24),
 
             // Editable Username
-            const Text('Edit Username', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Edit Username',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Card(
               child: Padding(
@@ -130,19 +142,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                       ElevatedButton(
+                      ElevatedButton(
                         onPressed: authProvider.isLoading
                             ? null
                             : () async {
                                 if (_usernameFormKey.currentState!.validate()) {
-                                  final newUsername = _usernameController.text.trim();
+                                  final newUsername = _usernameController.text
+                                      .trim();
                                   if (newUsername == user.username) return;
 
-                                  final success = await authProvider.changeUsername(newUsername);
+                                  final success = await authProvider
+                                      .changeUsername(newUsername);
                                   if (!context.mounted) return;
-                                  
+
                                   if (success) {
-                                    _showSuccessSnackBar('Username updated successfully');
+                                    _showSuccessSnackBar(
+                                      'Username updated successfully',
+                                    );
                                   } else {
                                     _showErrorDialog(authProvider.errorMessage);
                                   }
@@ -158,7 +174,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 24),
 
             // Change Password
-            const Text('Change Password', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Change Password',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Card(
               child: Padding(
@@ -203,16 +222,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ? null
                             : () async {
                                 if (_passwordFormKey.currentState!.validate()) {
-                                  final success = await authProvider.changePassword(
-                                    _currentPasswordController.text,
-                                    _newPasswordController.text,
-                                  );
+                                  final success = await authProvider
+                                      .changePassword(
+                                        _currentPasswordController.text,
+                                        _newPasswordController.text,
+                                      );
                                   if (!context.mounted) return;
 
                                   if (success) {
                                     _currentPasswordController.clear();
                                     _newPasswordController.clear();
-                                    _showSuccessSnackBar('Password changed successfully');
+                                    _showSuccessSnackBar(
+                                      'Password changed successfully',
+                                    );
                                   } else {
                                     _showErrorDialog(authProvider.errorMessage);
                                   }

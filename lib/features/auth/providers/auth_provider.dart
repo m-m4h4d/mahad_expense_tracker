@@ -43,8 +43,10 @@ class AuthProvider extends ChangeNotifier {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
-    final user = await DatabaseHelper.instance.getUserByUsernameOrEmail(identifier);
-    
+    final user = await DatabaseHelper.instance.getUserByUsernameOrEmail(
+      identifier,
+    );
+
     if (user != null && user.password == password) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('userId', user.id!);
@@ -61,7 +63,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> signUp(String fullName, String username, String email, String password) async {
+  Future<bool> signUp(
+    String fullName,
+    String username,
+    String email,
+    String password,
+  ) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -69,8 +76,11 @@ class AuthProvider extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 500));
 
     // Check uniqueness
-    final existingUser = await DatabaseHelper.instance.getUserByUsernameOrEmail(username);
-    final existingEmail = await DatabaseHelper.instance.getUserByUsernameOrEmail(email);
+    final existingUser = await DatabaseHelper.instance.getUserByUsernameOrEmail(
+      username,
+    );
+    final existingEmail = await DatabaseHelper.instance
+        .getUserByUsernameOrEmail(email);
 
     if (existingUser != null && existingUser.username == username) {
       _errorMessage = 'Username already exists';
@@ -78,7 +88,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    
+
     if (existingEmail != null && existingEmail.email == email) {
       _errorMessage = 'Email already exists';
       _isLoading = false;
@@ -116,7 +126,9 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = '';
     notifyListeners();
 
-    final existingUser = await DatabaseHelper.instance.getUserByUsername(newUsername);
+    final existingUser = await DatabaseHelper.instance.getUserByUsername(
+      newUsername,
+    );
     if (existingUser != null && existingUser.id != _currentUser!.id) {
       _errorMessage = 'Username already exists. Please choose another one.';
       _isLoading = false;
@@ -124,14 +136,20 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
-    await DatabaseHelper.instance.updateUserUsername(_currentUser!.id!, newUsername);
+    await DatabaseHelper.instance.updateUserUsername(
+      _currentUser!.id!,
+      newUsername,
+    );
     _currentUser = _currentUser!.copyWith(username: newUsername);
     _isLoading = false;
     notifyListeners();
     return true;
   }
 
-  Future<bool> changePassword(String currentPassword, String newPassword) async {
+  Future<bool> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
     if (_currentUser == null) return false;
     _isLoading = true;
     _errorMessage = '';
@@ -144,7 +162,10 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
-    await DatabaseHelper.instance.updateUserPassword(_currentUser!.id!, newPassword);
+    await DatabaseHelper.instance.updateUserPassword(
+      _currentUser!.id!,
+      newPassword,
+    );
     _currentUser = _currentUser!.copyWith(password: newPassword);
     _isLoading = false;
     notifyListeners();

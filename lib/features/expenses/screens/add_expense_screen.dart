@@ -26,15 +26,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     'Food',
     'Transport',
     'Utilities',
-    'Other'
+    'Other',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Expense'),
-      ),
+      appBar: AppBar(title: const Text('Add Expense')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -71,9 +69,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           decoration: InputDecoration(
                             labelText: 'Amount',
                             filled: true,
-                            prefixText: context.read<ExpenseProvider>().currencySymbol,
+                            prefixText: context
+                                .read<ExpenseProvider>()
+                                .currencySymbol,
                           ),
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter an amount';
@@ -143,8 +145,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                 category: _selectedCategory,
                                 date: _selectedDate,
                               );
-                              
-                              context.read<ExpenseProvider>().addExpense(newExpense);
+
+                              context.read<ExpenseProvider>().addExpense(
+                                newExpense,
+                              );
                               Navigator.pop(context);
                             }
                           },

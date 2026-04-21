@@ -47,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'Welcome to SpendWise',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
