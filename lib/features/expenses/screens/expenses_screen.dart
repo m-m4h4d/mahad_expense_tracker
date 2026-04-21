@@ -16,11 +16,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   final List<String> _categories = [
     'All',
+    'General',
+    'Groceries',
+    'Snacks',
     'Food',
     'Transport',
-    'Shopping',
-    'Bills',
-    'Other'
+    'Utilities',
+    'Other',
   ];
 
   @override
@@ -54,47 +56,68 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search expenses...',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        height: 56,
+                        child: TextField(
+                          controller: _searchController,
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                            hintText: 'Search expenses...',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 20,
+                            ),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          onChanged: (value) {
+                            expenseProvider.searchExpenses(value);
+                          },
                         ),
-                        onChanged: (value) {
-                          expenseProvider.searchExpenses(value);
-                        },
                       ),
                     ),
                     const SizedBox(width: 12),
-                    DropdownMenu<String>(
-                      initialSelection: expenseProvider.selectedCategory,
-                      onSelected: (String? value) {
-                        if (value != null) {
-                          expenseProvider.setFilterCategory(value);
-                        }
-                      },
-                      dropdownMenuEntries: _categories.map<DropdownMenuEntry<String>>((String value) {
-                        return DropdownMenuEntry<String>(value: value, label: value);
-                      }).toList(),
-                      inputDecorationTheme: InputDecorationTheme(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    SizedBox(
+                      height: 56,
+                      child: DropdownMenu<String>(
+                        initialSelection: expenseProvider.selectedCategory,
+                        onSelected: (String? value) {
+                          if (value != null) {
+                            expenseProvider.setFilterCategory(value);
+                          }
+                        },
+                        dropdownMenuEntries: _categories
+                            .map<DropdownMenuEntry<String>>((String value) {
+                              return DropdownMenuEntry<String>(
+                                value: value,
+                                label: value,
+                              );
+                            })
+                            .toList(),
+                        inputDecorationTheme: InputDecorationTheme(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 20,
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        width: 120, // To keep it compact
                       ),
-                      width: 120, // To keep it compact
-                    ),
+                    ), // Close SizedBox
                   ],
                 ),
               ),
 
               // Summary Card
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Card(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   child: Padding(
@@ -104,15 +127,21 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       children: [
                         Text(
                           'Total Spent',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                               ),
                         ),
                         Text(
-                          '\$${expenseProvider.totalSpent.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          '${expenseProvider.currencySymbol}${expenseProvider.totalSpent.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                               ),
                         ),
                       ],
@@ -128,17 +157,27 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
+                            Icon(
+                              Icons.receipt_long,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
                             const SizedBox(height: 16),
                             Text(
                               'No expenses found',
-                              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
+                              ),
                             ),
                           ],
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         itemCount: expenses.length,
                         itemBuilder: (context, index) {
                           final expense = expenses[index];
@@ -159,18 +198,28 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                       context: context,
                                       builder: (_) => AlertDialog(
                                         title: const Text('Delete Expense?'),
-                                        content: Text('Remove ${expense.title}?'),
+                                        content: Text(
+                                          'Remove ${expense.title}?',
+                                        ),
                                         actions: [
                                           TextButton(
-                                            onPressed: () => Navigator.pop(context),
+                                            onPressed: () =>
+                                                Navigator.pop(context),
                                             child: const Text('Cancel'),
                                           ),
                                           TextButton(
                                             onPressed: () {
-                                              expenseProvider.deleteExpense(expense.id!);
+                                              expenseProvider.deleteExpense(
+                                                expense.id!,
+                                              );
                                               Navigator.pop(context);
                                             },
-                                            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                            child: const Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -181,32 +230,46 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                     child: Row(
                                       children: [
                                         CircleAvatar(
-                                          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                          backgroundColor: Theme.of(
+                                            context,
+                                          ).colorScheme.secondaryContainer,
                                           child: Icon(
-                                            _getIconForCategory(expense.category),
-                                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                            _getIconForCategory(
+                                              expense.category,
+                                            ),
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSecondaryContainer,
                                           ),
                                         ),
                                         const SizedBox(width: 16),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 expense.title,
                                                 style: const TextStyle(
-                                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                DateFormat.yMMMd().format(expense.date),
-                                                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                                                DateFormat.yMMMd().format(
+                                                  expense.date,
+                                                ),
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
                                         Text(
-                                          '-\$${expense.amount.toStringAsFixed(2)}',
+                                          '-${expenseProvider.currencySymbol}${expense.amount.toStringAsFixed(2)}',
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Colors.red,
@@ -232,14 +295,19 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   IconData _getIconForCategory(String category) {
     switch (category) {
+      case 'Groceries':
+        return Icons.local_grocery_store;
+      case 'Snacks':
+        return Icons.fastfood; // Alternate icon for snacks
       case 'Food':
-        return Icons.fastfood;
+        return Icons.restaurant;
       case 'Transport':
         return Icons.directions_car;
-      case 'Shopping':
-        return Icons.shopping_bag;
-      case 'Bills':
+      case 'Utilities':
         return Icons.receipt;
+      case 'Other':
+        return Icons.money;
+      case 'General':
       default:
         return Icons.category;
     }

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../expenses/providers/expense_provider.dart';
+import 'profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final expenseProvider = Provider.of<ExpenseProvider>(context);
+
+    // List of supported currencies
+    final supportedCurrencies = ['PKR', 'INR', 'GBP', 'USD', 'EUR'];
 
     return Scaffold(
       appBar: AppBar(
@@ -20,15 +24,25 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 16),
-          _buildSectionHeader('Appearance', context),
-          SwitchListTile(
-            title: const Text('Dark Mode'),
-            subtitle: const Text('Toggle between light and dark themes'),
-            secondary: const Icon(Icons.dark_mode),
-            value: themeProvider.themeMode == ThemeMode.dark,
-            onChanged: (bool value) {
-              themeProvider.toggleTheme(value);
-            },
+          _buildSectionHeader('Preferences', context),
+          ListTile(
+            title: const Text('Default Currency'),
+            subtitle: const Text('Used as the base currency for expenses'),
+            leading: const Icon(Icons.monetization_on_outlined),
+            trailing: DropdownButton<String>(
+              value: expenseProvider.baseCurrency,
+              items: supportedCurrencies.map((String currency) {
+                return DropdownMenuItem(
+                  value: currency,
+                  child: Text(currency),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  expenseProvider.setBaseCurrency(newValue);
+                }
+              },
+            ),
           ),
           const Divider(),
           _buildSectionHeader('Account', context),
@@ -37,7 +51,10 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Profile Details'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Stub
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
             },
           ),
           ListTile(
@@ -56,8 +73,8 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close dialog
-                        authProvider.logout(); // Triggers AuthChecker to show LoginScreen
+                        Navigator.pop(context);
+                        authProvider.logout();
                       },
                       child: const Text('Logout', style: TextStyle(color: Colors.red)),
                     ),

@@ -9,102 +9,94 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Analytics'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Conversion'), elevation: 0),
       body: Consumer<ExpenseProvider>(
         builder: (context, expenseProvider, _) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        const Icon(Icons.analytics, size: 48, color: Colors.blue),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Total Spendings',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '\$${expenseProvider.totalSpent.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
-                              ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Divider(),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Currency Conversion (Cloud API)',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _CurrencyButton(
-                              currency: 'EUR',
-                              onPressed: () => expenseProvider.fetchExchangeRate('EUR'),
-                              expenseProvider: expenseProvider,
-                            ),
-                            _CurrencyButton(
-                              currency: 'GBP',
-                              onPressed: () => expenseProvider.fetchExchangeRate('GBP'),
-                              expenseProvider: expenseProvider,
-                            ),
-                            _CurrencyButton(
-                              currency: 'PKR',
-                              onPressed: () => expenseProvider.fetchExchangeRate('PKR'),
-                              expenseProvider: expenseProvider,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        if (expenseProvider.isLoading)
-                          const CircularProgressIndicator()
-                        else if (expenseProvider.targetCurrency != 'USD')
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.tertiaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'Equivalent in ${expenseProvider.targetCurrency}:\n${expenseProvider.targetCurrency} ${expenseProvider.convertedTotal.toStringAsFixed(2)}',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onTertiaryContainer,
-                              ),
-                            ),
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.analytics,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                      ],
+                          const SizedBox(height: 16),
+                          Text(
+                            'Total Spendings',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${expenseProvider.currencySymbol}${expenseProvider.totalSpent.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Currency Conversion',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 8.0,
+                            runSpacing: 8.0,
+                            alignment: WrapAlignment.center,
+                            children: expenseProvider
+                                .availableConversionCurrencies
+                                .map((currency) {
+                                  return _CurrencyButton(
+                                    currency: currency,
+                                    onPressed: () => expenseProvider
+                                        .fetchExchangeRate(currency),
+                                    expenseProvider: expenseProvider,
+                                  );
+                                })
+                                .toList(),
+                          ),
+                          const SizedBox(height: 24),
+                          if (expenseProvider.isLoading)
+                            const CircularProgressIndicator()
+                          else if (expenseProvider.targetCurrency !=
+                              expenseProvider.baseCurrency)
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'Equivalent in ${expenseProvider.targetCurrency}:\n${expenseProvider.targetCurrency} ${expenseProvider.convertedTotal.toStringAsFixed(2)}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: const [
-                        Icon(Icons.pie_chart, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text('Detailed charts coming soon!'),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -129,7 +121,9 @@ class _CurrencyButton extends StatelessWidget {
     final isSelected = expenseProvider.targetCurrency == currency;
     return ActionChip(
       label: Text(currency),
-      backgroundColor: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+      backgroundColor: isSelected
+          ? Theme.of(context).colorScheme.primaryContainer
+          : null,
       onPressed: onPressed,
     );
   }

@@ -12,9 +12,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _identifierController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +58,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   TextFormField(
-                    controller: _emailController,
+                    controller: _identifierController,
                     decoration: const InputDecoration(
-                      labelText: 'Email',
+                      labelText: 'Username or Email',
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: Icon(Icons.person),
                     ),
-                    keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty || !value.contains('@')) {
-                        return 'Please enter a valid email';
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your username or email';
                       }
                       return null;
                     },
@@ -88,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         : () async {
                             if (_formKey.currentState!.validate()) {
                               await authProvider.login(
-                                _emailController.text,
+                                _identifierController.text.trim(),
                                 _passwordController.text,
                               );
                             }

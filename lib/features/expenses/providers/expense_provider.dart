@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/database/db_helper.dart';
 import '../models/expense_model.dart';
 import 'package:http/http.dart' as http;
@@ -20,13 +21,51 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   // Currency Exchange state
+  String _baseCurrency = 'PKR';
+  String get baseCurrency => _baseCurrency;
+  
+  String get currencySymbol {
+    switch (_baseCurrency) {
+      case 'PKR': return 'Rs ';
+      case 'INR': return '₹';
+      case 'GBP': return '£';
+      case 'EUR': return '€';
+      case 'USD':
+      default: return '\$';
+    }
+  }
+  
   double _exchangeRate = 1.0;
-  String _targetCurrency = 'USD';
+  String _targetCurrency = 'PKR';
   String get targetCurrency => _targetCurrency;
   double get convertedTotal => totalSpent * _exchangeRate;
 
+  final List<String> supportedCurrencies = ['PKR', 'INR', 'GBP', 'USD', 'EUR'];
+
+  List<String> get availableConversionCurrencies {
+    return supportedCurrencies.where((c) => c != _baseCurrency).toList();
+  }
+
   ExpenseProvider() {
+    _loadBaseCurrency();
     loadExpenses();
+  }
+
+  Future<void> _loadBaseCurrency() async {
+    final prefs = await SharedPreferences.getInstance();
+    _baseCurrency = prefs.getString('baseCurrency') ?? 'PKR';
+    _targetCurrency = _baseCurrency; // Default conversion target to self
+    notifyListeners();
+  }
+
+  Future<void> setBaseCurrency(String currency) async {
+    _baseCurrency = currency;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('baseCurrency', currency);
+    // Reset target currency to base to avoid immediate wrong conversions
+    _targetCurrency = currency; 
+    _exchangeRate = 1.0;
+    notifyListeners();
   }
 
   Future<void> loadExpenses() async {
@@ -75,14 +114,13 @@ class ExpenseProvider extends ChangeNotifier {
     }).toList();
   }
 
-  // API Call to get exchange rates
+  // API Call to get exchange rates from current base Currency
   Future<void> fetchExchangeRate(String target) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Free public API for exchange rates (base USD for example)
-      final url = Uri.parse('https://api.exchangerate-api.com/v4/latest/USD');
+      final url = Uri.parse('https://api.exchangerate-api.com/v4/latest/$_baseCurrency');
       final response = await http.get(url);
       
       if (response.statusCode == 200) {

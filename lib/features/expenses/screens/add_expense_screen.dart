@@ -16,14 +16,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _amountController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  String _selectedCategory = 'Food';
+  String _selectedCategory = 'General';
   DateTime _selectedDate = DateTime.now();
 
   final List<String> _categories = [
+    'General',
+    'Groceries',
+    'Snacks',
     'Food',
     'Transport',
-    'Shopping',
-    'Bills',
+    'Utilities',
     'Other'
   ];
 
@@ -66,10 +68,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _amountController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Amount',
                             filled: true,
-                            prefixText: '\$ ',
+                            prefixText: context.read<ExpenseProvider>().currencySymbol,
                           ),
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           validator: (value) {
