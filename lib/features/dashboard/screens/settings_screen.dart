@@ -18,7 +18,9 @@ class SettingsScreen extends StatelessWidget {
     final supportedCurrencies = ['PKR', 'INR', 'GBP', 'USD', 'EUR'];
 
     return Scaffold(
-      appBar: kIsWeb ? null : AppBar(title: const Text('Settings'), elevation: 0),
+      appBar: kIsWeb
+          ? null
+          : AppBar(title: const Text('Settings'), elevation: 0),
       body: ListView(
         children: [
           const SizedBox(height: 16),

@@ -247,25 +247,40 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                           ),
                                         ),
                                         IconButton(
-                                          icon: const Icon(Icons.delete_outline),
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                          ),
                                           color: Colors.red[300],
                                           onPressed: () {
                                             showDialog(
                                               context: context,
                                               builder: (_) => AlertDialog(
-                                                title: const Text('Delete Expense?'),
-                                                content: Text('Remove ${expense.title}?'),
+                                                title: const Text(
+                                                  'Delete Expense?',
+                                                ),
+                                                content: Text(
+                                                  'Remove ${expense.title}?',
+                                                ),
                                                 actions: [
                                                   TextButton(
-                                                    onPressed: () => Navigator.pop(context),
+                                                    onPressed: () =>
+                                                        Navigator.pop(context),
                                                     child: const Text('Cancel'),
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
-                                                      expenseProvider.deleteExpense(expense.id!);
+                                                      expenseProvider
+                                                          .deleteExpense(
+                                                            expense.id!,
+                                                          );
                                                       Navigator.pop(context);
                                                     },
-                                                    child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                                    child: const Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),

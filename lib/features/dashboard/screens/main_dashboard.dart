@@ -37,21 +37,30 @@ class _MainDashboardState extends State<MainDashboard> {
     }
   }
 
-  Widget _buildWebLayout(BuildContext context, bool isDarkMode, ThemeProvider themeProvider) {
+  Widget _buildWebLayout(
+    BuildContext context,
+    bool isDarkMode,
+    ThemeProvider themeProvider,
+  ) {
     final isDesktop = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
         title: Row(
-          mainAxisAlignment: isDesktop ? MainAxisAlignment.spaceAround : MainAxisAlignment.start,
+          mainAxisAlignment: isDesktop
+              ? MainAxisAlignment.spaceAround
+              : MainAxisAlignment.start,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset('assets/images/logo.png', height: 40),
                 const SizedBox(width: 8),
-                const Text('SpendWise', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'SpendWise',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
             if (isDesktop)
@@ -60,17 +69,38 @@ class _MainDashboardState extends State<MainDashboard> {
                 children: [
                   TextButton(
                     onPressed: () => setState(() => _currentIndex = 0),
-                    child: Text('Expenses', style: TextStyle(color: _currentIndex == 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface)),
+                    child: Text(
+                      'Expenses',
+                      style: TextStyle(
+                        color: _currentIndex == 0
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   TextButton(
                     onPressed: () => setState(() => _currentIndex = 1),
-                    child: Text('Analytics', style: TextStyle(color: _currentIndex == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface)),
+                    child: Text(
+                      'Analytics',
+                      style: TextStyle(
+                        color: _currentIndex == 1
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   TextButton(
                     onPressed: () => setState(() => _currentIndex = 2),
-                    child: Text('Settings', style: TextStyle(color: _currentIndex == 2 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface)),
+                    child: Text(
+                      'Settings',
+                      style: TextStyle(
+                        color: _currentIndex == 2
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   _buildThemeToggle(themeProvider, isDarkMode),
@@ -93,7 +123,9 @@ class _MainDashboardState extends State<MainDashboard> {
                 children: [
                   DrawerHeader(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +133,10 @@ class _MainDashboardState extends State<MainDashboard> {
                       children: [
                         Image.asset('assets/images/logo.png', height: 40),
                         const SizedBox(height: 8),
-                        Text('SpendWise', style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                          'SpendWise',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ],
                     ),
                   ),
@@ -151,7 +186,11 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  Widget _buildNativeMobileLayout(BuildContext context, bool isDarkMode, ThemeProvider themeProvider) {
+  Widget _buildNativeMobileLayout(
+    BuildContext context,
+    bool isDarkMode,
+    ThemeProvider themeProvider,
+  ) {
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -166,21 +205,29 @@ class _MainDashboardState extends State<MainDashboard> {
             IconButton(
               icon: Icon(
                 _currentIndex == 0 ? Icons.home : Icons.home_outlined,
-                color: _currentIndex == 0 ? Theme.of(context).colorScheme.primary : null,
+                color: _currentIndex == 0
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               onPressed: () => setState(() => _currentIndex = 0),
             ),
             IconButton(
               icon: Icon(
-                _currentIndex == 1 ? Icons.currency_exchange : Icons.currency_exchange,
-                color: _currentIndex == 1 ? Theme.of(context).colorScheme.primary : null,
+                _currentIndex == 1
+                    ? Icons.currency_exchange
+                    : Icons.currency_exchange,
+                color: _currentIndex == 1
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               onPressed: () => setState(() => _currentIndex = 1),
             ),
             IconButton(
               icon: Icon(
                 _currentIndex == 2 ? Icons.settings : Icons.settings_outlined,
-                color: _currentIndex == 2 ? Theme.of(context).colorScheme.primary : null,
+                color: _currentIndex == 2
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
               ),
               onPressed: () => setState(() => _currentIndex = 2),
             ),
@@ -223,12 +270,16 @@ class _MainDashboardState extends State<MainDashboard> {
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const AddExpenseScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const AddExpenseScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 1.0);
           const end = Offset.zero;
           const curve = Curves.easeInOut;
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
           var offsetAnimation = animation.drive(tween);
           return SlideTransition(position: offsetAnimation, child: child);
         },

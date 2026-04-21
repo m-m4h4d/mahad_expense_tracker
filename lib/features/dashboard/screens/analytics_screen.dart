@@ -10,7 +10,9 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb ? null : AppBar(title: const Text('Conversion'), elevation: 0),
+      appBar: kIsWeb
+          ? null
+          : AppBar(title: const Text('Conversion'), elevation: 0),
       body: Consumer<ExpenseProvider>(
         builder: (context, expenseProvider, _) {
           return SingleChildScrollView(

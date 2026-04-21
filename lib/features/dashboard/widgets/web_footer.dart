@@ -19,9 +19,9 @@ class WebFooter extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'SpendWise',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
