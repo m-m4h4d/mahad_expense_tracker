@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -28,18 +29,20 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SpendWise'),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              context.read<ExpenseProvider>().loadExpenses();
-            },
-          ),
-        ],
-      ),
+      appBar: kIsWeb
+          ? null
+          : AppBar(
+              title: const Text('SpendWise'),
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {
+                    context.read<ExpenseProvider>().loadExpenses();
+                  },
+                ),
+              ],
+            ),
       body: Consumer<ExpenseProvider>(
         builder: (context, expenseProvider, child) {
           if (expenseProvider.isLoading) {
@@ -192,39 +195,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                   onTap: () {
                                     // Could navigate to details screen
                                   },
-                                  onLongPress: () {
-                                    // Show delete confirmation
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                        title: const Text('Delete Expense?'),
-                                        content: Text(
-                                          'Remove ${expense.title}?',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              expenseProvider.deleteExpense(
-                                                expense.id!,
-                                              );
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text(
-                                              'Delete',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Row(
@@ -275,6 +245,32 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                             color: Colors.red,
                                             fontSize: 16,
                                           ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete_outline),
+                                          color: Colors.red[300],
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (_) => AlertDialog(
+                                                title: const Text('Delete Expense?'),
+                                                content: Text('Remove ${expense.title}?'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.pop(context),
+                                                    child: const Text('Cancel'),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      expenseProvider.deleteExpense(expense.id!);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +10,7 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Conversion'), elevation: 0),
+      appBar: kIsWeb ? null : AppBar(title: const Text('Conversion'), elevation: 0),
       body: Consumer<ExpenseProvider>(
         builder: (context, expenseProvider, _) {
           return SingleChildScrollView(
