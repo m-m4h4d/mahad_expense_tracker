@@ -38,7 +38,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.account_balance_wallet, size: 80, color: Colors.green),
+                  Image.asset(
+                    'assets/icons/favicon.png',
+                    width: 80,
+                    height: 80,
+                  ),
                   const SizedBox(height: 24),
                   Text(
                     'Welcome to SpendWise',
