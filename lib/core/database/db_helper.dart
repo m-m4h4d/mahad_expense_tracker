@@ -18,9 +18,10 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
+    Database db;
     if (kIsWeb) {
       var factory = databaseFactoryFfiWeb;
-      return await factory.openDatabase(
+      db = await factory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
           version: 2,
@@ -32,13 +33,21 @@ class DatabaseHelper {
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, filePath);
 
-      return await openDatabase(
+      db = await openDatabase(
         path,
         version: 2,
         onCreate: _createDB,
         onUpgrade: _upgradeDB,
       );
     }
+
+    // Seed default tester user automatically
+    await db.execute('''
+      INSERT OR IGNORE INTO users (fullName, username, email, password)
+      VALUES ('Main Character', 'test', 'user@example.com', 'abc123')
+    ''');
+
+    return db;
   }
 
   Future _createDB(Database db, int version) async {
