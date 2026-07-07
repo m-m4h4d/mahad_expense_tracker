@@ -30,7 +30,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       'Other',
     ],
     'Income': ['Salary', 'Business', 'Investments', 'Freelance', 'Other'],
-    'Loan': ['Borrowed', 'Lent', 'Repayment', 'Other'],
+    'Loan': ['Borrowed', 'Lent', 'Repayment', 'Received', 'Other'],
   };
 
   List<String> get _currentCategories => _categoryMap[_selectedType]!;

@@ -156,10 +156,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               );
                               if (success) {
                                 if (!context.mounted) return;
-                                // Need to navigate nicely or pop so AuthChecker routes to Dashboard
-                                // Since we pushed this on top of LoginScreen, we can just pop back to login
-                                // or pushReplacement to Dashboard. Since AuthChecker dynamically builds,
-                                // popping might land on login briefly before jumping. popping all works.
                                 Navigator.of(
                                   context,
                                 ).popUntil((route) => route.isFirst);

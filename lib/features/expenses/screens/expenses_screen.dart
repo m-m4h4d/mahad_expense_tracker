@@ -28,6 +28,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     'Borrowed',
     'Lent',
     'Repayment',
+    'Received',
     'Other',
   ];
 
@@ -362,10 +363,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         return Icons.arrow_downward;
       case 'Lent':
         return Icons.arrow_upward;
-      case 'Repayment':
-        return Icons.check_circle_outline;
-      case 'Other':
-        return Icons.money;
+      case 'Repayment': return Icons.check_circle_outline;
+      case 'Received': return Icons.call_received;
+      case 'Other': return Icons.money;
       case 'General':
       default:
         return Icons.category;

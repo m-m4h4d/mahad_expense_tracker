@@ -98,12 +98,85 @@ class AnalyticsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.account_balance,
+                                size: 32,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Loans Overview',
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          _buildStatRow(
+                            context,
+                            'Total Borrowed',
+                            expenseProvider.totalBorrowed,
+                            expenseProvider.currencySymbol,
+                            Colors.orange,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildStatRow(
+                            context,
+                            'Total Repaid',
+                            expenseProvider.totalRepaid,
+                            expenseProvider.currencySymbol,
+                            Colors.green,
+                          ),
+                          const Divider(height: 24),
+                          _buildStatRow(
+                            context,
+                            'Total Lent',
+                            expenseProvider.totalLent,
+                            expenseProvider.currencySymbol,
+                            Colors.blue,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildStatRow(
+                            context,
+                            'Total Received',
+                            expenseProvider.totalReceived,
+                            expenseProvider.currencySymbol,
+                            Colors.teal,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildStatRow(BuildContext context, String title, double amount, String currency, Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          '$currency${amount.toStringAsFixed(2)}',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+        ),
+      ],
     );
   }
 }

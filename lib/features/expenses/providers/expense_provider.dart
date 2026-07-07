@@ -28,6 +28,22 @@ class ExpenseProvider extends ChangeNotifier {
     return _filteredExpenses.where((e) => e.type == 'Loan').fold(0, (sum, item) => sum + item.amount);
   }
 
+  double get totalBorrowed {
+    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Borrowed').fold(0, (sum, item) => sum + item.amount);
+  }
+
+  double get totalRepaid {
+    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Repayment').fold(0, (sum, item) => sum + item.amount);
+  }
+
+  double get totalLent {
+    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Lent').fold(0, (sum, item) => sum + item.amount);
+  }
+
+  double get totalReceived {
+    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Received').fold(0, (sum, item) => sum + item.amount);
+  }
+
   double get netBalance {
     return totalIncome - totalExpenses;
   }
