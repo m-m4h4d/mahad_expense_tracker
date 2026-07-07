@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -29,9 +29,9 @@
 
     <main class="hero">
         <div class="hero-content">
-            <h2 class="hero-title">Track your expenses, smartly.</h2>
-            <p class="hero-subtitle">SpendWise is a clean, modern expense tracker made by Mahad. Take control of your
-                personal finances with an intuitive Material 3 design.</p>
+            <h2 class="hero-title">Track your finances, smartly.</h2>
+            <p class="hero-subtitle">SpendWise is a clean, modern finance tracker made by Mahad. Take control of your
+                incomes, expenses, and loans with an intuitive Material 3 design.</p>
 
             <div class="specs">
                 <div class="spec-card">
@@ -40,9 +40,9 @@
                     <p>Built with Flutter and Material 3 guidelines for a seamless, aesthetic experience.</p>
                 </div>
                 <div class="spec-card">
-                    <div class="spec-icon">🌓</div>
-                    <h3>Dark Mode</h3>
-                    <p>Native support for dark and light modes, automatically adapting to your preferences.</p>
+                    <div class="spec-icon">📊</div>
+                    <h3>Comprehensive Tracking</h3>
+                    <p>Easily track your expenses, incomes, and loans all in one place with a unified dashboard.</p>
                 </div>
                 <div class="spec-card">
                     <div class="spec-icon">🔒</div>
@@ -91,12 +91,14 @@
 
     <script>
         const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : 'dark';
 
         if (currentTheme) {
             document.documentElement.setAttribute('data-theme', currentTheme);
             if (currentTheme === 'dark') {
                 toggleSwitch.checked = true;
+            } else {
+                toggleSwitch.checked = false;
             }
         }
 

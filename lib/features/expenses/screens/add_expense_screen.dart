@@ -21,7 +21,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   DateTime _selectedDate = DateTime.now();
 
   final Map<String, List<String>> _categoryMap = {
-    'Expense': ['General', 'Groceries', 'Snacks', 'Food', 'Transport', 'Utilities', 'Other'],
+    'Expense': [
+      'General',
+      'Food',
+      'Transport',
+      'Utilities',
+      'Sbscriptions',
+      'Other',
+    ],
     'Income': ['Salary', 'Business', 'Investments', 'Freelance', 'Other'],
     'Loan': ['Borrowed', 'Lent', 'Repayment', 'Other'],
   };
@@ -51,15 +58,22 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       children: [
                         SegmentedButton<String>(
                           segments: const [
-                            ButtonSegment(value: 'Expense', label: Text('Expense')),
-                            ButtonSegment(value: 'Income', label: Text('Income')),
+                            ButtonSegment(
+                              value: 'Expense',
+                              label: Text('Expense'),
+                            ),
+                            ButtonSegment(
+                              value: 'Income',
+                              label: Text('Income'),
+                            ),
                             ButtonSegment(value: 'Loan', label: Text('Loan')),
                           ],
                           selected: {_selectedType},
                           onSelectionChanged: (Set<String> newSelection) {
                             setState(() {
                               _selectedType = newSelection.first;
-                              _selectedCategory = _categoryMap[_selectedType]!.first;
+                              _selectedCategory =
+                                  _categoryMap[_selectedType]!.first;
                             });
                           },
                         ),

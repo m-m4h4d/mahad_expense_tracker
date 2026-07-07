@@ -17,9 +17,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   final List<String> _categories = [
     'All',
-    'General', 'Groceries', 'Snacks', 'Food', 'Transport', 'Utilities',
-    'Salary', 'Business', 'Investments', 'Freelance',
-    'Borrowed', 'Lent', 'Repayment',
+    'General',
+    'Food',
+    'Transport',
+    'Utilities',
+    'Salary',
+    'Business',
+    'Investments',
+    'Freelance',
+    'Borrowed',
+    'Lent',
+    'Repayment',
     'Other',
   ];
 
@@ -132,7 +140,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                               'Net Balance',
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
-                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                                   ),
                             ),
                             Text(
@@ -140,7 +150,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                               style: Theme.of(context).textTheme.headlineSmall
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                                   ),
                             ),
                           ],
@@ -151,11 +163,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           children: [
                             Text(
                               '↓ Income: ${expenseProvider.currencySymbol}${expenseProvider.totalIncome.toStringAsFixed(2)}',
-                              style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.green[700],
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Text(
                               '↑ Expenses: ${expenseProvider.currencySymbol}${expenseProvider.totalExpenses.toStringAsFixed(2)}',
-                              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -254,7 +272,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                           '${expense.type == 'Income' ? '+' : '-'}${expenseProvider.currencySymbol}${expense.amount.toStringAsFixed(2)}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: expense.type == 'Income' ? Colors.green : (expense.type == 'Loan' ? Colors.orange : Colors.red),
+                                            color: expense.type == 'Income'
+                                                ? Colors.green
+                                                : (expense.type == 'Loan'
+                                                      ? Colors.orange
+                                                      : Colors.red),
                                             fontSize: 16,
                                           ),
                                         ),
@@ -318,21 +340,35 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   IconData _getIconForCategory(String category) {
     switch (category) {
-      case 'Groceries': return Icons.local_grocery_store;
-      case 'Snacks': return Icons.fastfood;
-      case 'Food': return Icons.restaurant;
-      case 'Transport': return Icons.directions_car;
-      case 'Utilities': return Icons.receipt;
-      case 'Salary': return Icons.account_balance_wallet;
-      case 'Business': return Icons.business_center;
-      case 'Investments': return Icons.trending_up;
-      case 'Freelance': return Icons.computer;
-      case 'Borrowed': return Icons.arrow_downward;
-      case 'Lent': return Icons.arrow_upward;
-      case 'Repayment': return Icons.check_circle_outline;
-      case 'Other': return Icons.money;
+      case 'Groceries':
+        return Icons.local_grocery_store;
+      case 'Snacks':
+        return Icons.fastfood;
+      case 'Food':
+        return Icons.restaurant;
+      case 'Transport':
+        return Icons.directions_car;
+      case 'Utilities':
+        return Icons.receipt;
+      case 'Salary':
+        return Icons.account_balance_wallet;
+      case 'Business':
+        return Icons.business_center;
+      case 'Investments':
+        return Icons.trending_up;
+      case 'Freelance':
+        return Icons.computer;
+      case 'Borrowed':
+        return Icons.arrow_downward;
+      case 'Lent':
+        return Icons.arrow_upward;
+      case 'Repayment':
+        return Icons.check_circle_outline;
+      case 'Other':
+        return Icons.money;
       case 'General':
-      default: return Icons.category;
+      default:
+        return Icons.category;
     }
   }
 }
