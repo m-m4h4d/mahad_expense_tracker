@@ -155,7 +155,7 @@ input:checked+.slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 6rem 5%;
+    padding: 4rem 5%;
     text-align: center;
 }
 
