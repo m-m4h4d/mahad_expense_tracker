@@ -22,7 +22,7 @@ lib/
 │   ├── utils/             # Constants and helper functions
 │   └── services/          # Core services (e.g., database)
 ├── features/
-│   ├── auth/              # Authentication related screens and logic
+│   ├── auth/              # Authentication-related screens and logic
 │   ├── dashboard/         # Main dashboard and summaries
 │   ├── expenses/          # Expense tracking
 │   ├── incomes/           # Income tracking
@@ -49,7 +49,7 @@ lib/
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/m-m4h4d/mahad_expense_tracker
    cd mahad_expense_tracker
    ```
 
