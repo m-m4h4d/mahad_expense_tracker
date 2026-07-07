@@ -4,6 +4,7 @@ class Expense {
   final double amount;
   final String category;
   final DateTime date;
+  final String type;
 
   Expense({
     this.id,
@@ -11,6 +12,7 @@ class Expense {
     required this.amount,
     required this.category,
     required this.date,
+    required this.type,
   });
 
   Expense copyWith({
@@ -19,6 +21,7 @@ class Expense {
     double? amount,
     String? category,
     DateTime? date,
+    String? type,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -26,6 +29,7 @@ class Expense {
       amount: amount ?? this.amount,
       category: category ?? this.category,
       date: date ?? this.date,
+      type: type ?? this.type,
     );
   }
 
@@ -36,6 +40,7 @@ class Expense {
       'amount': amount,
       'category': category,
       'date': date.toIso8601String(),
+      'type': type,
     };
   }
 
@@ -46,6 +51,7 @@ class Expense {
       amount: map['amount'],
       category: map['category'],
       date: DateTime.parse(map['date']),
+      type: map['type'] ?? 'Expense',
     );
   }
 }

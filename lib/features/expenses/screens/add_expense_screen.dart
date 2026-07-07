@@ -16,18 +16,17 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _amountController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  String _selectedType = 'Expense';
   String _selectedCategory = 'General';
   DateTime _selectedDate = DateTime.now();
 
-  final List<String> _categories = [
-    'General',
-    'Groceries',
-    'Snacks',
-    'Food',
-    'Transport',
-    'Utilities',
-    'Other',
-  ];
+  final Map<String, List<String>> _categoryMap = {
+    'Expense': ['General', 'Groceries', 'Snacks', 'Food', 'Transport', 'Utilities', 'Other'],
+    'Income': ['Salary', 'Business', 'Investments', 'Freelance', 'Other'],
+    'Loan': ['Borrowed', 'Lent', 'Repayment', 'Other'],
+  };
+
+  List<String> get _currentCategories => _categoryMap[_selectedType]!;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +49,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        SegmentedButton<String>(
+                          segments: const [
+                            ButtonSegment(value: 'Expense', label: Text('Expense')),
+                            ButtonSegment(value: 'Income', label: Text('Income')),
+                            ButtonSegment(value: 'Loan', label: Text('Loan')),
+                          ],
+                          selected: {_selectedType},
+                          onSelectionChanged: (Set<String> newSelection) {
+                            setState(() {
+                              _selectedType = newSelection.first;
+                              _selectedCategory = _categoryMap[_selectedType]!.first;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
                         TextFormField(
                           controller: _titleController,
                           decoration: const InputDecoration(
@@ -88,12 +102,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         ),
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
+                          key: ValueKey(_selectedType),
                           initialValue: _selectedCategory,
                           decoration: const InputDecoration(
                             labelText: 'Category',
                             filled: true,
                           ),
-                          items: _categories.map((String category) {
+                          items: _currentCategories.map((String category) {
                             return DropdownMenuItem(
                               value: category,
                               child: Text(category),
@@ -144,6 +159,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                 amount: double.parse(_amountController.text),
                                 category: _selectedCategory,
                                 date: _selectedDate,
+                                type: _selectedType,
                               );
 
                               context.read<ExpenseProvider>().addExpense(

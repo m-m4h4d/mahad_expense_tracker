@@ -16,9 +16,23 @@ class ExpenseProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get selectedCategory => _selectedCategory;
 
-  double get totalSpent {
-    return _filteredExpenses.fold(0, (sum, item) => sum + item.amount);
+  double get totalExpenses {
+    return _filteredExpenses.where((e) => e.type == 'Expense').fold(0, (sum, item) => sum + item.amount);
   }
+
+  double get totalIncome {
+    return _filteredExpenses.where((e) => e.type == 'Income').fold(0, (sum, item) => sum + item.amount);
+  }
+
+  double get totalLoans {
+    return _filteredExpenses.where((e) => e.type == 'Loan').fold(0, (sum, item) => sum + item.amount);
+  }
+
+  double get netBalance {
+    return totalIncome - totalExpenses;
+  }
+
+  double get totalSpent => totalExpenses;
 
   // Currency Exchange state
   String _baseCurrency = 'PKR';

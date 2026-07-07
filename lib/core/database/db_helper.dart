@@ -24,7 +24,7 @@ class DatabaseHelper {
       db = await factory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
-          version: 2,
+          version: 3,
           onCreate: _createDB,
           onUpgrade: _upgradeDB,
         ),
@@ -35,7 +35,7 @@ class DatabaseHelper {
 
       db = await openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _createDB,
         onUpgrade: _upgradeDB,
       );
@@ -61,7 +61,8 @@ class DatabaseHelper {
         title $textType,
         amount $realType,
         category $textType,
-        date $textType
+        date $textType,
+        type $textType
       )
     ''');
 
@@ -90,6 +91,9 @@ class DatabaseHelper {
           password $textType
         )
       ''');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE expenses ADD COLUMN type TEXT NOT NULL DEFAULT "Expense"');
     }
   }
 
