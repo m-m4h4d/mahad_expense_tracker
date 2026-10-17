@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ExpenseProvider extends ChangeNotifier {
+  int? _userId;
   List<Expense> _expenses = [];
   List<Expense> _filteredExpenses = [];
   bool _isLoading = false;
@@ -83,7 +84,23 @@ class ExpenseProvider extends ChangeNotifier {
 
   ExpenseProvider() {
     _loadBaseCurrency();
-    loadExpenses();
+  }
+
+  // Called by the ProxyProvider in main.dart whenever AuthProvider changes.
+  Future<void> setUser(int? userId) {
+    if (userId == _userId) return Future.value();
+    _userId = userId;
+    _expenses = [];
+    _searchQuery = '';
+    _selectedCategory = 'All';
+    _applyFiltersAndSearch();
+    // Deferred because this runs while the widget tree is building.
+    return Future.microtask(() async {
+      if (userId != null) {
+        await DatabaseHelper.instance.claimUnownedExpenses(userId);
+      }
+      await loadExpenses();
+    });
   }
 
   Future<void> _loadBaseCurrency() async {
@@ -104,10 +121,22 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   Future<void> loadExpenses() async {
+    final userId = _userId;
+    if (userId == null) {
+      _expenses = [];
+      _applyFiltersAndSearch();
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
     _isLoading = true;
     notifyListeners();
 
-    _expenses = await DatabaseHelper.instance.readAllExpenses();
+    final expenses = await DatabaseHelper.instance.readExpensesForUser(userId);
+    // The user may have logged out or switched while the query was running.
+    if (userId != _userId) return;
+    _expenses = expenses;
     _applyFiltersAndSearch();
 
     _isLoading = false;
@@ -115,17 +144,25 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   Future<void> addExpense(Expense expense) async {
-    await DatabaseHelper.instance.createExpense(expense);
+    final userId = _userId;
+    if (userId == null) return;
+    await DatabaseHelper.instance.createExpense(
+      expense.copyWith(userId: userId),
+    );
     await loadExpenses();
   }
 
   Future<void> updateExpense(Expense expense) async {
-    await DatabaseHelper.instance.updateExpense(expense);
+    final userId = _userId;
+    if (userId == null) return;
+    await DatabaseHelper.instance.updateExpense(expense, userId);
     await loadExpenses();
   }
 
   Future<void> deleteExpense(int id) async {
-    await DatabaseHelper.instance.deleteExpense(id);
+    final userId = _userId;
+    if (userId == null) return;
+    await DatabaseHelper.instance.deleteExpense(id, userId);
     await loadExpenses();
   }
 

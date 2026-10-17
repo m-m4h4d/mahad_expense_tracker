@@ -13,7 +13,11 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ExpenseProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, ExpenseProvider>(
+          create: (_) => ExpenseProvider(),
+          update: (_, auth, expenses) =>
+              expenses!..setUser(auth.currentUser?.id),
+        ),
       ],
       child: const SpendWiseApp(),
     ),

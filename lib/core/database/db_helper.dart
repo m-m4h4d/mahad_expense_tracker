@@ -24,7 +24,7 @@ class DatabaseHelper {
       db = await factory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
-          version: 3,
+          version: 4,
           onCreate: _createDB,
           onUpgrade: _upgradeDB,
         ),
@@ -35,7 +35,7 @@ class DatabaseHelper {
 
       db = await openDatabase(
         path,
-        version: 3,
+        version: 4,
         onCreate: _createDB,
         onUpgrade: _upgradeDB,
       );
@@ -62,9 +62,13 @@ class DatabaseHelper {
         amount $realType,
         category $textType,
         date $textType,
-        type $textType
+        type $textType,
+        user_id INTEGER REFERENCES users(id)
       )
     ''');
+    await db.execute(
+      'CREATE INDEX idx_expenses_user_id ON expenses (user_id)',
+    );
 
     await db.execute('''
       CREATE TABLE users (
@@ -95,6 +99,16 @@ class DatabaseHelper {
     if (oldVersion < 3) {
       await db.execute('ALTER TABLE expenses ADD COLUMN type TEXT NOT NULL DEFAULT "Expense"');
     }
+    if (oldVersion < 4) {
+      // Existing rows keep a NULL user_id; they are claimed by the first
+      // user who logs in after the upgrade (see claimUnownedExpenses).
+      await db.execute(
+        'ALTER TABLE expenses ADD COLUMN user_id INTEGER REFERENCES users(id)',
+      );
+      await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses (user_id)',
+      );
+    }
   }
 
   // --- Expenses CRUD ---
@@ -104,26 +118,45 @@ class DatabaseHelper {
     return expense.copyWith(id: id);
   }
 
-  Future<List<Expense>> readAllExpenses() async {
+  Future<List<Expense>> readExpensesForUser(int userId) async {
     final db = await instance.database;
     const orderBy = 'date DESC';
-    final result = await db.query('expenses', orderBy: orderBy);
+    final result = await db.query(
+      'expenses',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: orderBy,
+    );
     return result.map((json) => Expense.fromMap(json)).toList();
   }
 
-  Future<int> updateExpense(Expense expense) async {
+  Future<int> updateExpense(Expense expense, int userId) async {
     final db = await instance.database;
     return db.update(
       'expenses',
-      expense.toMap(),
-      where: 'id = ?',
-      whereArgs: [expense.id],
+      expense.copyWith(userId: userId).toMap(),
+      where: 'id = ? AND user_id = ?',
+      whereArgs: [expense.id, userId],
     );
   }
 
-  Future<int> deleteExpense(int id) async {
+  Future<int> deleteExpense(int id, int userId) async {
     final db = await instance.database;
-    return await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
+    return await db.delete(
+      'expenses',
+      where: 'id = ? AND user_id = ?',
+      whereArgs: [id, userId],
+    );
+  }
+
+  // Assigns expenses created before per-user storage existed to [userId].
+  Future<int> claimUnownedExpenses(int userId) async {
+    final db = await instance.database;
+    return await db.update(
+      'expenses',
+      {'user_id': userId},
+      where: 'user_id IS NULL',
+    );
   }
 
   // --- Users CRUD ---
