@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/database/db_helper.dart';
+import '../../../../core/security/password_hasher.dart';
 import '../models/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -41,13 +42,11 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = '';
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 500));
-
     final user = await DatabaseHelper.instance.getUserByUsernameOrEmail(
       identifier,
     );
 
-    if (user != null && user.password == password) {
+    if (user != null && await PasswordHasher.verify(password, user.password)) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('userId', user.id!);
       _currentUser = user;
@@ -72,8 +71,6 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 500));
 
     // Check uniqueness
     final existingUser = await DatabaseHelper.instance.getUserByUsernameOrEmail(
@@ -101,7 +98,7 @@ class AuthProvider extends ChangeNotifier {
         fullName: fullName,
         username: username,
         email: email,
-        password: password,
+        password: await PasswordHasher.hash(password),
       );
       final createdUser = await DatabaseHelper.instance.createUser(newUser);
 
@@ -155,18 +152,19 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = '';
     notifyListeners();
 
-    if (_currentUser!.password != currentPassword) {
+    if (!await PasswordHasher.verify(currentPassword, _currentUser!.password)) {
       _errorMessage = 'Current password is incorrect';
       _isLoading = false;
       notifyListeners();
       return false;
     }
 
+    final passwordHash = await PasswordHasher.hash(newPassword);
     await DatabaseHelper.instance.updateUserPassword(
       _currentUser!.id!,
-      newPassword,
+      passwordHash,
     );
-    _currentUser = _currentUser!.copyWith(password: newPassword);
+    _currentUser = _currentUser!.copyWith(password: passwordHash);
     _isLoading = false;
     notifyListeners();
     return true;

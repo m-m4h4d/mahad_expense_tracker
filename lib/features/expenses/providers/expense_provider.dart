@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ExpenseProvider extends ChangeNotifier {
+  int? _userId;
   List<Expense> _expenses = [];
   List<Expense> _filteredExpenses = [];
   bool _isLoading = false;
@@ -16,33 +17,27 @@ class ExpenseProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get selectedCategory => _selectedCategory;
 
-  double get totalExpenses {
-    return _filteredExpenses.where((e) => e.type == 'Expense').fold(0, (sum, item) => sum + item.amount);
-  }
+  // Totals always cover every transaction; search and category filters
+  // only narrow the visible list.
+  double _sum(bool Function(Expense e) test) =>
+      _expenses.where(test).fold(0, (sum, item) => sum + item.amount);
 
-  double get totalIncome {
-    return _filteredExpenses.where((e) => e.type == 'Income').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalExpenses => _sum((e) => e.type == 'Expense');
 
-  double get totalLoans {
-    return _filteredExpenses.where((e) => e.type == 'Loan').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalIncome => _sum((e) => e.type == 'Income');
 
-  double get totalBorrowed {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Borrowed').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalLoans => _sum((e) => e.type == 'Loan');
 
-  double get totalRepaid {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Repayment').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalBorrowed =>
+      _sum((e) => e.type == 'Loan' && e.category == 'Borrowed');
 
-  double get totalLent {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Lent').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalRepaid =>
+      _sum((e) => e.type == 'Loan' && e.category == 'Repayment');
 
-  double get totalReceived {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Received').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalLent => _sum((e) => e.type == 'Loan' && e.category == 'Lent');
+
+  double get totalReceived =>
+      _sum((e) => e.type == 'Loan' && e.category == 'Received');
 
   double get netBalance {
     return totalIncome - totalExpenses;
@@ -83,7 +78,23 @@ class ExpenseProvider extends ChangeNotifier {
 
   ExpenseProvider() {
     _loadBaseCurrency();
-    loadExpenses();
+  }
+
+  // Called by the ProxyProvider in main.dart whenever AuthProvider changes.
+  Future<void> setUser(int? userId) {
+    if (userId == _userId) return Future.value();
+    _userId = userId;
+    _expenses = [];
+    _searchQuery = '';
+    _selectedCategory = 'All';
+    _applyFiltersAndSearch();
+    // Deferred because this runs while the widget tree is building.
+    return Future.microtask(() async {
+      if (userId != null) {
+        await DatabaseHelper.instance.claimUnownedExpenses(userId);
+      }
+      await loadExpenses();
+    });
   }
 
   Future<void> _loadBaseCurrency() async {
@@ -104,10 +115,22 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   Future<void> loadExpenses() async {
+    final userId = _userId;
+    if (userId == null) {
+      _expenses = [];
+      _applyFiltersAndSearch();
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
     _isLoading = true;
     notifyListeners();
 
-    _expenses = await DatabaseHelper.instance.readAllExpenses();
+    final expenses = await DatabaseHelper.instance.readExpensesForUser(userId);
+    // The user may have logged out or switched while the query was running.
+    if (userId != _userId) return;
+    _expenses = expenses;
     _applyFiltersAndSearch();
 
     _isLoading = false;
@@ -115,17 +138,25 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   Future<void> addExpense(Expense expense) async {
-    await DatabaseHelper.instance.createExpense(expense);
+    final userId = _userId;
+    if (userId == null) return;
+    await DatabaseHelper.instance.createExpense(
+      expense.copyWith(userId: userId),
+    );
     await loadExpenses();
   }
 
   Future<void> updateExpense(Expense expense) async {
-    await DatabaseHelper.instance.updateExpense(expense);
+    final userId = _userId;
+    if (userId == null) return;
+    await DatabaseHelper.instance.updateExpense(expense, userId);
     await loadExpenses();
   }
 
   Future<void> deleteExpense(int id) async {
-    await DatabaseHelper.instance.deleteExpense(id);
+    final userId = _userId;
+    if (userId == null) return;
+    await DatabaseHelper.instance.deleteExpense(id, userId);
     await loadExpenses();
   }
 

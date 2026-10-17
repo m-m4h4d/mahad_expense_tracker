@@ -8,15 +8,21 @@ import 'features/auth/screens/auth_checker.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ExpenseProvider()),
-      ],
-      child: const SpendWiseApp(),
-    ),
+  runApp(createApp());
+}
+
+// The app with its providers; tests pump this to get the real widget tree.
+Widget createApp() {
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ChangeNotifierProxyProvider<AuthProvider, ExpenseProvider>(
+        create: (_) => ExpenseProvider(),
+        update: (_, auth, expenses) => expenses!..setUser(auth.currentUser?.id),
+      ),
+    ],
+    child: const SpendWiseApp(),
   );
 }
 

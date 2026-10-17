@@ -3,6 +3,7 @@ class User {
   final String fullName;
   final String username;
   final String email;
+  // PBKDF2 hash produced by PasswordHasher, never the plain password.
   final String password;
 
   User({
