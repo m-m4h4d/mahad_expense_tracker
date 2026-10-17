@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -26,8 +27,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
-    await databaseFactory.deleteDatabase(
-      join(await getDatabasesPath(), 'spendwise.db'),
+    // Each test file runs in its own isolate; give each its own database.
+    await databaseFactory.setDatabasesPath(
+      Directory.systemTemp.createTempSync('spendwise_test').path,
     );
 
     final db = DatabaseHelper.instance;

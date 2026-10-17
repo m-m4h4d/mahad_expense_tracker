@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import '../security/password_hasher.dart';
 import '../../features/expenses/models/expense_model.dart';
 import '../../features/auth/models/user_model.dart';
 
@@ -24,7 +25,7 @@ class DatabaseHelper {
       db = await factory.openDatabase(
         filePath,
         options: OpenDatabaseOptions(
-          version: 4,
+          version: 5,
           onCreate: _createDB,
           onUpgrade: _upgradeDB,
         ),
@@ -35,17 +36,11 @@ class DatabaseHelper {
 
       db = await openDatabase(
         path,
-        version: 4,
+        version: 5,
         onCreate: _createDB,
         onUpgrade: _upgradeDB,
       );
     }
-
-    // Seed default tester user automatically
-    await db.execute('''
-      INSERT OR IGNORE INTO users (fullName, username, email, password)
-      VALUES ('Main Character', 'test', 'user@example.com', 'abc123')
-    ''');
 
     return db;
   }
@@ -66,9 +61,7 @@ class DatabaseHelper {
         user_id INTEGER REFERENCES users(id)
       )
     ''');
-    await db.execute(
-      'CREATE INDEX idx_expenses_user_id ON expenses (user_id)',
-    );
+    await db.execute('CREATE INDEX idx_expenses_user_id ON expenses (user_id)');
 
     await db.execute('''
       CREATE TABLE users (
@@ -97,7 +90,9 @@ class DatabaseHelper {
       ''');
     }
     if (oldVersion < 3) {
-      await db.execute('ALTER TABLE expenses ADD COLUMN type TEXT NOT NULL DEFAULT "Expense"');
+      await db.execute(
+        'ALTER TABLE expenses ADD COLUMN type TEXT NOT NULL DEFAULT "Expense"',
+      );
     }
     if (oldVersion < 4) {
       // Existing rows keep a NULL user_id; they are claimed by the first
@@ -108,6 +103,34 @@ class DatabaseHelper {
       await db.execute(
         'CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses (user_id)',
       );
+    }
+    if (oldVersion < 5) {
+      // Older builds seeded a public test account (test / abc123) on every
+      // launch. Drop it unless someone has changed its password or put
+      // transactions in it.
+      await db.delete(
+        'users',
+        where: '''
+          username = 'test' AND email = 'user@example.com'
+          AND password = 'abc123'
+          AND id NOT IN (
+            SELECT user_id FROM expenses WHERE user_id IS NOT NULL
+          )
+        ''',
+      );
+
+      // Passwords used to be stored in plain text.
+      final users = await db.query('users', columns: ['id', 'password']);
+      for (final user in users) {
+        final password = user['password'] as String;
+        if (PasswordHasher.isHashed(password)) continue;
+        await db.update(
+          'users',
+          {'password': await PasswordHasher.hash(password)},
+          where: 'id = ?',
+          whereArgs: [user['id']],
+        );
+      }
     }
   }
 
@@ -152,11 +175,9 @@ class DatabaseHelper {
   // Assigns expenses created before per-user storage existed to [userId].
   Future<int> claimUnownedExpenses(int userId) async {
     final db = await instance.database;
-    return await db.update(
-      'expenses',
-      {'user_id': userId},
-      where: 'user_id IS NULL',
-    );
+    return await db.update('expenses', {
+      'user_id': userId,
+    }, where: 'user_id IS NULL');
   }
 
   // --- Users CRUD ---
@@ -201,11 +222,11 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<int> updateUserPassword(int userId, String newPassword) async {
+  Future<int> updateUserPassword(int userId, String passwordHash) async {
     final db = await instance.database;
     return await db.update(
       'users',
-      {'password': newPassword},
+      {'password': passwordHash},
       where: 'id = ?',
       whereArgs: [userId],
     );
