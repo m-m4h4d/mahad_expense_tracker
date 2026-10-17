@@ -9,12 +9,18 @@ import 'package:spend_wise/features/auth/models/user_model.dart';
 import 'package:spend_wise/features/expenses/models/expense_model.dart';
 import 'package:spend_wise/features/expenses/providers/expense_provider.dart';
 
-Expense _expense(String title, {int? userId}) => Expense(
+Expense _expense(
+  String title, {
+  int? userId,
+  double amount = 10,
+  String category = 'Food',
+  String type = 'Expense',
+}) => Expense(
   title: title,
-  amount: 10,
-  category: 'Food',
+  amount: amount,
+  category: category,
   date: DateTime(2026, 1, 1),
-  type: 'Expense',
+  type: type,
   userId: userId,
 );
 
@@ -78,5 +84,47 @@ void main() {
 
     await provider.setUser(null);
     expect(provider.expenses, isEmpty);
+  });
+
+  test('search and category filters do not change totals', () async {
+    final db = DatabaseHelper.instance;
+    final carol = (await db.createUser(
+      User(
+        fullName: 'Carol',
+        username: 'carol',
+        email: 'c@x.com',
+        password: 'p',
+      ),
+    )).id!;
+    final provider = ExpenseProvider();
+    await provider.setUser(carol);
+    await provider.addExpense(_expense('Coffee', amount: 5));
+    await provider.addExpense(
+      _expense('Bus', amount: 20, category: 'Transport'),
+    );
+    await provider.addExpense(
+      _expense('Pay', amount: 1000, category: 'Salary', type: 'Income'),
+    );
+    await provider.addExpense(
+      _expense('From Dan', amount: 300, category: 'Borrowed', type: 'Loan'),
+    );
+
+    void expectFullTotals() {
+      expect(provider.totalExpenses, 25);
+      expect(provider.totalIncome, 1000);
+      expect(provider.netBalance, 975);
+      expect(provider.totalBorrowed, 300);
+    }
+
+    expectFullTotals();
+
+    provider.searchExpenses('coffee');
+    expect(provider.expenses.map((e) => e.title), ['Coffee']);
+    expectFullTotals();
+
+    provider.searchExpenses('');
+    provider.setFilterCategory('Transport');
+    expect(provider.expenses.map((e) => e.title), ['Bus']);
+    expectFullTotals();
   });
 }

@@ -17,33 +17,27 @@ class ExpenseProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get selectedCategory => _selectedCategory;
 
-  double get totalExpenses {
-    return _filteredExpenses.where((e) => e.type == 'Expense').fold(0, (sum, item) => sum + item.amount);
-  }
+  // Totals always cover every transaction; search and category filters
+  // only narrow the visible list.
+  double _sum(bool Function(Expense e) test) =>
+      _expenses.where(test).fold(0, (sum, item) => sum + item.amount);
 
-  double get totalIncome {
-    return _filteredExpenses.where((e) => e.type == 'Income').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalExpenses => _sum((e) => e.type == 'Expense');
 
-  double get totalLoans {
-    return _filteredExpenses.where((e) => e.type == 'Loan').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalIncome => _sum((e) => e.type == 'Income');
 
-  double get totalBorrowed {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Borrowed').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalLoans => _sum((e) => e.type == 'Loan');
 
-  double get totalRepaid {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Repayment').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalBorrowed =>
+      _sum((e) => e.type == 'Loan' && e.category == 'Borrowed');
 
-  double get totalLent {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Lent').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalRepaid =>
+      _sum((e) => e.type == 'Loan' && e.category == 'Repayment');
 
-  double get totalReceived {
-    return _filteredExpenses.where((e) => e.type == 'Loan' && e.category == 'Received').fold(0, (sum, item) => sum + item.amount);
-  }
+  double get totalLent => _sum((e) => e.type == 'Loan' && e.category == 'Lent');
+
+  double get totalReceived =>
+      _sum((e) => e.type == 'Loan' && e.category == 'Received');
 
   double get netBalance {
     return totalIncome - totalExpenses;
